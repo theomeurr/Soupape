@@ -105,3 +105,48 @@ export const IconChevron = (p: IconProps) => (
     <path d="m9 18 6-6-6-6" />
   </Svg>
 );
+
+export const IconBell = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+  </Svg>
+);
+
+export const IconCamera = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" />
+    <circle cx="12" cy="13" r="3" />
+  </Svg>
+);
+
+export const IconCloud = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M17.5 19a4.5 4.5 0 0 0 0-9h-1.8A7 7 0 1 0 4 16.5" />
+    <path d="M12 12v9" />
+    <path d="m8 17 4-4 4 4" />
+  </Svg>
+);
+
+export const IconPrinter = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M6 9V2h12v7" />
+    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+    <rect x="6" y="14" width="12" height="8" rx="1" />
+  </Svg>
+);
+
+export const IconFile = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z" />
+    <path d="M14 2v5h5" />
+    <path d="M16 13H8" />
+    <path d="M16 17H8" />
+  </Svg>
+);
+
+export const IconCheck = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20 6 9 17l-5-5" />
+  </Svg>
+);

@@ -16,6 +16,8 @@ import { BottomSheet } from '../components/BottomSheet';
 import { PageHeader, Section, Row, Fab } from '../components/Page';
 import { Button, Field, Input, Segmented, Select, Stat, StatGrid, EmptyState } from '../components/UI';
 import { IconWrench, IconTrash } from '../components/Icons';
+import { Reminders } from '../components/Reminders';
+import { PhotoPicker } from '../components/PhotoPicker';
 
 const ACCENT = '#BF5AF2';
 
@@ -27,6 +29,7 @@ interface MaintForm {
   odometer: string;
   garage: string;
   note: string;
+  photos: string[];
 }
 
 const emptyForm = (): MaintForm => ({
@@ -37,6 +40,7 @@ const emptyForm = (): MaintForm => ({
   odometer: '',
   garage: '',
   note: '',
+  photos: [],
 });
 
 export function MaintenancePage() {
@@ -79,6 +83,7 @@ export function MaintenancePage() {
       odometer: e.odometer ? String(e.odometer) : '',
       garage: e.garage ?? '',
       note: e.note ?? '',
+      photos: e.photos ?? [],
     });
     setSheetOpen(true);
   }
@@ -94,6 +99,7 @@ export function MaintenancePage() {
       odometer: form.odometer ? parseNumber(form.odometer) : undefined,
       garage: form.garage.trim() || undefined,
       note: form.note.trim() || undefined,
+      photos: form.photos.length ? form.photos : undefined,
     };
     if (editingId) update('maintenance', editingId, payload);
     else add('maintenance', payload);
@@ -118,6 +124,8 @@ export function MaintenancePage() {
         </StatGrid>
       </Section>
 
+      <Reminders />
+
       <Section title="Interventions">
         {sorted.length === 0 ? (
           <EmptyState
@@ -131,7 +139,9 @@ export function MaintenancePage() {
               <Row
                 key={e.id}
                 title={e.title}
-                subtitle={`${e.category} · ${formatDate(e.date)}${e.garage ? ' · ' + e.garage : ''}`}
+                subtitle={`${e.category} · ${formatDate(e.date)}${e.garage ? ' · ' + e.garage : ''}${
+                  e.photos?.length ? ' · 📷' + e.photos.length : ''
+                }`}
                 value={formatCurrency(e.cost)}
                 meta={e.odometer ? formatKm(e.odometer) : undefined}
                 onClick={() => openEdit(e)}
@@ -206,6 +216,9 @@ export function MaintenancePage() {
               value={form.garage}
               onChange={(e) => setForm({ ...form, garage: e.target.value })}
             />
+          </Field>
+          <Field label="Factures / photos">
+            <PhotoPicker value={form.photos} onChange={(photos) => setForm({ ...form, photos })} />
           </Field>
           <Button onClick={submit}>{editingId ? 'Enregistrer' : "Ajouter l'intervention"}</Button>
         </div>

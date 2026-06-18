@@ -6,7 +6,9 @@ Installable sur iPhone/Android, fonctionne **hors-ligne**, données stockées **
 - 3 catégories dans une barre d'onglets « liquid glass » animée (style iOS)
 - Un bouton discret 📈 sur chaque catégorie ouvre les graphiques (par mois / année)
 - Calculs automatiques : consommation (L/100 km), prix moyen au litre, coût au km, distance/mois…
-- Sauvegarde / restauration par export-import JSON
+- **Rappels d'entretien** (vidange, CT…) par distance et/ou durée, avec échéancier « À venir »
+- **Photos de factures** attachées aux interventions + **carnet d'entretien imprimable (PDF)** et **export CSV**
+- Sauvegarde / restauration par export-import JSON et **synchro Google Drive** (optionnelle)
 
 ## Stack
 
@@ -44,8 +46,27 @@ npm run icons
 
 ## Données & confidentialité
 
-Tout est stocké dans le `localStorage` du navigateur, **rien n'est envoyé sur un serveur**.
-Pense à **exporter** (Réglages → Exporter) de temps en temps pour garder une sauvegarde.
+Tout est stocké **localement** sur l'appareil (IndexedDB), **rien n'est envoyé sur un serveur**
+— sauf si tu actives la sauvegarde Google Drive ci-dessous. Pense à **exporter** (Réglages)
+de temps en temps, ou active la synchro Drive.
+
+## Sauvegarde Google Drive (optionnelle)
+
+La sauvegarde utilise un fichier privé dans le dossier caché `appDataFolder` de **ton** Drive
+(portée `drive.appdata` : l'app ne voit que son propre fichier). Mise en place :
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → nouveau projet.
+2. **APIs & Services → Library** → active **Google Drive API**.
+3. **OAuth consent screen** → type *External*, mode *Testing*, ajoute ton compte Google en *test user*.
+4. **Credentials → Create credentials → OAuth client ID → Web application**.
+   Dans *Authorized JavaScript origins*, ajoute l'URL de l'app :
+   - `http://localhost:5173` (dev)
+   - `https://<utilisateur>.github.io` (prod Pages)
+5. Copie le **Client ID** (`…apps.googleusercontent.com`) dans **Réglages → Sauvegarde Google Drive**.
+6. Bouton **Sauvegarder** / **Restaurer**.
+
+> La portée `drive.appdata` n'est pas vérifiée tant que le projet reste en *Testing* : c'est
+> parfait pour un usage perso (toi seul, ajouté en test user).
 
 ## Idées d'évolutions
 

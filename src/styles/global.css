@@ -796,6 +796,243 @@ p {
   margin-top: 4px;
 }
 
+/* ---------- Splash ---------- */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(135% 48% at 50% 30%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
+    var(--bg-base);
+}
+.splash-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #fff));
+  box-shadow: 0 10px 30px -8px var(--accent);
+  animation: splash-pulse 1.2s ease-in-out infinite;
+}
+@keyframes splash-pulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Section head with action ---------- */
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 4px 10px;
+}
+.section-head .section-title {
+  margin: 0;
+}
+.section-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px 6px 9px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.section-add:active {
+  transform: scale(0.94);
+}
+
+/* ---------- Reminders ---------- */
+
+.reminders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.reminder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  padding: 13px 15px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.reminder:active {
+  transform: scale(0.99);
+  background: rgba(255, 255, 255, 0.08);
+}
+.reminder-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.reminder-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.reminder-summary {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rc);
+  white-space: nowrap;
+}
+.reminder-cat {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-top: -2px;
+}
+.reminder-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.reminder-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--rc);
+  transition: width 0.4s ease;
+}
+.reminder-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 15px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  color: var(--text-dim);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.reminder-empty svg {
+  flex: none;
+  color: var(--accent);
+}
+
+/* ---------- Photos ---------- */
+
+.photos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.photo-thumb {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-remove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.photo-add {
+  width: 74px;
+  height: 74px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.photo-add:active {
+  transform: scale(0.95);
+}
+.photo-add:disabled {
+  opacity: 0.5;
+}
+
+/* ---------- Settings extras ---------- */
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.settings-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.settings-title svg {
+  color: var(--accent);
+}
+.settings-actions {
+  display: flex;
+  gap: 10px;
+}
+.settings-msg {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 12px;
+  border-radius: 10px;
+}
+.settings-msg.ok {
+  color: #30d158;
+  background: rgba(48, 209, 88, 0.12);
+}
+.settings-msg.err {
+  color: #ff453a;
+  background: rgba(255, 69, 58, 0.12);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition-duration: 0.01ms !important;

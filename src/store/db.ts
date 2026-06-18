@@ -1,6 +1,7 @@
 import type { AppData } from '../types';
+import { idbGet, idbSet } from './idb';
 
-const STORAGE_KEY = 'soupape:data';
+const LEGACY_KEY = 'soupape:data'; // ancien stockage localStorage (migration)
 const CURRENT_VERSION = 1;
 
 export const DEFAULT_DATA: AppData = {
@@ -9,26 +10,35 @@ export const DEFAULT_DATA: AppData = {
   fuel: [],
   mileage: [],
   maintenance: [],
+  reminders: [],
 };
 
-/** Load and migrate data from localStorage, falling back to defaults. */
-export function loadData(): AppData {
+/** Load data from IndexedDB, migrating any older localStorage payload on first run. */
+export async function loadData(): Promise<AppData> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return structuredClone(DEFAULT_DATA);
-    const parsed = JSON.parse(raw) as Partial<AppData>;
-    return migrate(parsed);
+    const stored = await idbGet<Partial<AppData>>();
+    if (stored) return migrate(stored);
+
+    // One-time migration from the previous localStorage-based version.
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if (legacy) {
+      const migrated = migrate(JSON.parse(legacy) as Partial<AppData>);
+      await idbSet(migrated);
+      localStorage.removeItem(LEGACY_KEY);
+      return migrated;
+    }
+    return structuredClone(DEFAULT_DATA);
   } catch (err) {
     console.error('Soupape: lecture des données impossible, réinitialisation.', err);
     return structuredClone(DEFAULT_DATA);
   }
 }
 
-export function saveData(data: AppData): void {
+export async function saveData(data: AppData): Promise<void> {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    await idbSet(data);
   } catch (err) {
-    console.error('Soupape: sauvegarde impossible (stockage plein ?).', err);
+    console.error('Soupape: sauvegarde impossible.', err);
   }
 }
 
@@ -40,6 +50,7 @@ function migrate(input: Partial<AppData>): AppData {
     fuel: input.fuel ?? [],
     mileage: input.mileage ?? [],
     maintenance: input.maintenance ?? [],
+    reminders: input.reminders ?? [],
   };
 }
 
@@ -49,7 +60,12 @@ export function parseImported(text: string): AppData {
   if (typeof parsed !== 'object' || parsed === null) {
     throw new Error('Fichier invalide');
   }
-  if (!Array.isArray(parsed.fuel) && !Array.isArray(parsed.mileage) && !Array.isArray(parsed.maintenance)) {
+  if (
+    !Array.isArray(parsed.fuel) &&
+    !Array.isArray(parsed.mileage) &&
+    !Array.isArray(parsed.maintenance) &&
+    !Array.isArray(parsed.reminders)
+  ) {
     throw new Error('Aucune donnée Soupape reconnue dans ce fichier');
   }
   return migrate(parsed);
