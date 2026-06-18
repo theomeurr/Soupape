@@ -18,7 +18,7 @@ import { PageHeader, Section, Row, Fab } from '../components/Page';
 import { Button, Field, Input, Segmented, Select, Stat, StatGrid, EmptyState } from '../components/UI';
 import { IconFuel, IconTrash } from '../components/Icons';
 
-const ACCENT = '#FF9F0A';
+const ACCENT = '#FF9500';
 
 interface FuelForm {
   date: string;

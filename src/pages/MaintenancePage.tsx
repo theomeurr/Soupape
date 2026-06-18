@@ -19,7 +19,7 @@ import { IconWrench, IconTrash } from '../components/Icons';
 import { Reminders } from '../components/Reminders';
 import { PhotoPicker } from '../components/PhotoPicker';
 
-const ACCENT = '#BF5AF2';
+const ACCENT = '#AF52DE';
 
 interface MaintForm {
   date: string;

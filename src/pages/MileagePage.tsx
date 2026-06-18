@@ -10,7 +10,7 @@ import { PageHeader, Section, Row, Fab } from '../components/Page';
 import { Button, Field, Input, Segmented, Stat, StatGrid, EmptyState } from '../components/UI';
 import { IconGauge, IconTrash } from '../components/Icons';
 
-const ACCENT = '#0A84FF';
+const ACCENT = '#007AFF';
 
 interface MileageForm {
   date: string;

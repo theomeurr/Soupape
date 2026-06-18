@@ -8,9 +8,9 @@ import { MaintenancePage } from './pages/MaintenancePage';
 import { SettingsSheet } from './components/SettingsSheet';
 
 const TABS: TabDef[] = [
-  { id: 'mileage', label: 'Kilométrage', Icon: IconGauge, accent: '#0A84FF' },
-  { id: 'fuel', label: 'Essence', Icon: IconFuel, accent: '#FF9F0A' },
-  { id: 'maintenance', label: 'Entretien', Icon: IconWrench, accent: '#BF5AF2' },
+  { id: 'mileage', label: 'Kilométrage', Icon: IconGauge, accent: '#007AFF' },
+  { id: 'fuel', label: 'Essence', Icon: IconFuel, accent: '#FF9500' },
+  { id: 'maintenance', label: 'Entretien', Icon: IconWrench, accent: '#AF52DE' },
 ];
 
 export default function App() {
@@ -18,7 +18,7 @@ export default function App() {
   const [active, setActive] = useState('mileage');
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const accent = TABS.find((t) => t.id === active)?.accent ?? '#0A84FF';
+  const accent = TABS.find((t) => t.id === active)?.accent ?? '#007AFF';
 
   // Expose the active accent globally so portaled sheets inherit it too.
   useEffect(() => {

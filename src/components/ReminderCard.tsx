@@ -2,9 +2,9 @@ import type { CSSProperties } from 'react';
 import type { ReminderDue } from '../lib/reminders';
 
 const STATUS_COLOR: Record<ReminderDue['status'], string> = {
-  overdue: '#FF453A',
-  soon: '#FF9F0A',
-  ok: '#30D158',
+  overdue: '#FF3B30',
+  soon: '#FF9500',
+  ok: '#34C759',
 };
 
 export function ReminderCard({ due, onClick }: { due: ReminderDue; onClick: () => void }) {
