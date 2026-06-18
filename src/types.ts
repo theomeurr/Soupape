@@ -1,6 +1,6 @@
 // Domain model for Soupape — all amounts in EUR, distances in km, volumes in L.
 
-export type CollectionKey = 'fuel' | 'mileage' | 'maintenance' | 'reminders';
+export type CollectionKey = 'fuel' | 'mileage' | 'maintenance' | 'reminders' | 'documents';
 
 export type FuelType = 'SP95' | 'SP98' | 'SP95-E10' | 'Diesel' | 'E85' | 'GPL' | 'Électrique';
 
@@ -85,10 +85,39 @@ export interface Reminder {
   note?: string;
 }
 
+export type DocumentType =
+  | 'Carte grise'
+  | 'Assurance'
+  | 'Contrôle technique'
+  | 'Garantie'
+  | 'Facture'
+  | 'Autre';
+
+export const DOCUMENT_TYPES: DocumentType[] = [
+  'Carte grise',
+  'Assurance',
+  'Contrôle technique',
+  'Garantie',
+  'Facture',
+  'Autre',
+];
+
+export interface DocumentItem {
+  id: string;
+  title: string;
+  type: DocumentType;
+  expiryDate?: string; // échéance (assurance, CT…)
+  reference?: string; // n° de contrat, plaque…
+  note?: string;
+  photos?: string[]; // scans / photos (data URLs JPEG compressées)
+}
+
 export interface Settings {
   carName: string;
   currency: string; // ISO code, e.g. 'EUR'
   tankCapacity?: number; // L (optionnel)
+  fiscalCv?: string; // puissance fiscale pour le barème km
+  isElectric?: boolean; // véhicule électrique (+20% barème)
   driveClientId?: string; // OAuth client ID Google (sauvegarde Drive)
   lastBackupAt?: string; // ISO datetime de la dernière sauvegarde Drive
 }
@@ -100,6 +129,7 @@ export interface AppData {
   mileage: MileageEntry[];
   maintenance: MaintenanceEntry[];
   reminders: Reminder[];
+  documents: DocumentItem[];
 }
 
 export type EntryMap = {
@@ -107,4 +137,5 @@ export type EntryMap = {
   mileage: MileageEntry;
   maintenance: MaintenanceEntry;
   reminders: Reminder;
+  documents: DocumentItem;
 };

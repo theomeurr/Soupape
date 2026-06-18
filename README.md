@@ -8,6 +8,9 @@ Installable sur iPhone/Android, fonctionne **hors-ligne**, données stockées **
 - Calculs automatiques : consommation (L/100 km), prix moyen au litre, coût au km, distance/mois…
 - **Rappels d'entretien** (vidange, CT…) par distance et/ou durée, avec échéancier « À venir »
 - **Photos de factures** attachées aux interventions + **carnet d'entretien imprimable (PDF)** et **export CSV**
+- **Prix carburant** officiels + station la moins chère autour de toi (géoloc)
+- **Barème kilométrique** fiscal (indemnités km) pré-rempli avec tes km de l'année
+- **Documents** : carte grise, assurance, contrôle technique, garanties (échéances + photos)
 - Sauvegarde / restauration par export-import JSON et **synchro Google Drive** (optionnelle)
 
 ## Stack

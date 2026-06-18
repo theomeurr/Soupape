@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useStore } from './store/StoreContext';
 import { TabBar, type TabDef } from './components/TabBar';
-import { IconGauge, IconFuel, IconWrench, IconSettings } from './components/Icons';
+import { IconGauge, IconFuel, IconWrench, IconSettings, IconFolder } from './components/Icons';
 import { MileagePage } from './pages/MileagePage';
 import { FuelPage } from './pages/FuelPage';
 import { MaintenancePage } from './pages/MaintenancePage';
 import { SettingsSheet } from './components/SettingsSheet';
+import { DocumentsSheet } from './components/DocumentsSheet';
 
 const TABS: TabDef[] = [
   { id: 'mileage', label: 'Kilométrage', Icon: IconGauge, accent: '#007AFF' },
@@ -17,6 +18,7 @@ export default function App() {
   const { data } = useStore();
   const [active, setActive] = useState('mileage');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [docsOpen, setDocsOpen] = useState(false);
 
   const accent = TABS.find((t) => t.id === active)?.accent ?? '#007AFF';
 
@@ -32,14 +34,14 @@ export default function App() {
           <span className="brand-mark" />
           <span className="brand-name">{data.settings.carName || 'Soupape'}</span>
         </button>
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={() => setSettingsOpen(true)}
-          aria-label="Réglages"
-        >
-          <IconSettings size={22} />
-        </button>
+        <div className="header-actions">
+          <button type="button" className="icon-btn" onClick={() => setDocsOpen(true)} aria-label="Documents">
+            <IconFolder size={21} />
+          </button>
+          <button type="button" className="icon-btn" onClick={() => setSettingsOpen(true)} aria-label="Réglages">
+            <IconSettings size={22} />
+          </button>
+        </div>
       </header>
 
       <main className="app-main">
@@ -51,6 +53,7 @@ export default function App() {
       <TabBar tabs={TABS} active={active} onChange={setActive} />
 
       <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <DocumentsSheet open={docsOpen} onClose={() => setDocsOpen(false)} />
     </div>
   );
 }

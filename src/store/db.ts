@@ -11,6 +11,7 @@ export const DEFAULT_DATA: AppData = {
   mileage: [],
   maintenance: [],
   reminders: [],
+  documents: [],
 };
 
 /** Load data from IndexedDB, migrating any older localStorage payload on first run. */
@@ -51,6 +52,7 @@ function migrate(input: Partial<AppData>): AppData {
     mileage: input.mileage ?? [],
     maintenance: input.maintenance ?? [],
     reminders: input.reminders ?? [],
+    documents: input.documents ?? [],
   };
 }
 

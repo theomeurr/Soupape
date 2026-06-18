@@ -3,12 +3,14 @@ import { useStore } from '../store/StoreContext';
 import type { MileageEntry } from '../types';
 import { mileageStats, odometerPoints } from '../lib/stats';
 import { aggregate, type Period } from '../lib/date';
-import { formatKm, formatDate, formatNumber, parseNumber, todayISO } from '../lib/format';
+import { formatCurrency, formatKm, formatDate, formatNumber, parseNumber, todayISO } from '../lib/format';
+import { baremeKm, type CvBracket } from '../lib/baremeKm';
 import { BarChart } from '../components/Charts';
 import { BottomSheet } from '../components/BottomSheet';
+import { BaremeSheet } from '../components/BaremeSheet';
 import { PageHeader, Section, Row, Fab } from '../components/Page';
 import { Button, Field, Input, Segmented, Stat, StatGrid, EmptyState } from '../components/UI';
-import { IconGauge, IconTrash } from '../components/Icons';
+import { IconGauge, IconTrash, IconCalc, IconChevron } from '../components/Icons';
 
 const ACCENT = '#007AFF';
 
@@ -27,6 +29,7 @@ export function MileagePage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<MileageForm>(emptyForm);
   const [chartOpen, setChartOpen] = useState(false);
+  const [baremeOpen, setBaremeOpen] = useState(false);
   const [period, setPeriod] = useState<Period>('month');
 
   const points = useMemo(() => odometerPoints(data.fuel, data.mileage), [data.fuel, data.mileage]);
@@ -90,6 +93,24 @@ export function MileagePage() {
           <Stat label="Cette année" value={formatKm(stats.thisYear)} />
           <Stat label="Moyenne / mois" value={formatKm(stats.perMonth)} />
         </StatGrid>
+      </Section>
+
+      <Section>
+        <button type="button" className="row tool-row" onClick={() => setBaremeOpen(true)}>
+          <span className="tool-icon">
+            <IconCalc size={20} />
+          </span>
+          <div className="row-main">
+            <span className="row-title">Barème kilométrique</span>
+            <span className="row-subtitle">Indemnités km (impôts) · cette année</span>
+          </div>
+          <span className="row-value">
+            {formatCurrency(
+              baremeKm((data.settings.fiscalCv as CvBracket) || '5', stats.thisYear, data.settings.isElectric ?? false),
+            )}
+          </span>
+          <IconChevron size={18} className="row-chevron" />
+        </button>
       </Section>
 
       <Section title="Relevés">
@@ -181,6 +202,8 @@ export function MileagePage() {
           </div>
         </div>
       </BottomSheet>
+
+      <BaremeSheet open={baremeOpen} onClose={() => setBaremeOpen(false)} />
     </>
   );
 }

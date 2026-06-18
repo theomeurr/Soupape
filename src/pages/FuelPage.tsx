@@ -14,9 +14,11 @@ import {
 } from '../lib/format';
 import { BarChart, LineChart } from '../components/Charts';
 import { BottomSheet } from '../components/BottomSheet';
+import { StationsSheet } from '../components/StationsSheet';
+import { API_TO_FUELTYPE, type ApiFuelKey, type Station } from '../lib/fuelPrices';
 import { PageHeader, Section, Row, Fab } from '../components/Page';
 import { Button, Field, Input, Segmented, Select, Stat, StatGrid, EmptyState } from '../components/UI';
-import { IconFuel, IconTrash } from '../components/Icons';
+import { IconFuel, IconTrash, IconPin, IconChevron } from '../components/Icons';
 
 const ACCENT = '#FF9500';
 
@@ -53,6 +55,7 @@ export function FuelPage() {
   const [form, setForm] = useState<FuelForm>(emptyForm);
 
   const [chartOpen, setChartOpen] = useState(false);
+  const [stationsOpen, setStationsOpen] = useState(false);
   const [metric, setMetric] = useState<'cost' | 'price' | 'consumption'>('cost');
   const [period, setPeriod] = useState<Period>('month');
 
@@ -71,6 +74,13 @@ export function FuelPage() {
   function openAdd() {
     setEditingId(null);
     setForm(emptyForm());
+    setSheetOpen(true);
+  }
+
+  function useStation(s: Station, key: ApiFuelKey) {
+    setEditingId(null);
+    setForm({ ...emptyForm(), station: s.name, fuelType: API_TO_FUELTYPE[key] });
+    setStationsOpen(false);
     setSheetOpen(true);
   }
 
@@ -135,6 +145,19 @@ export function FuelPage() {
           <Stat label="Prix moyen" value={stats.avgPricePerLiter ? fmtPrice(stats.avgPricePerLiter) : '—'} sub="par litre" />
           <Stat label="Pleins" value={stats.fillUps} sub={formatLiters(stats.totalLiters)} />
         </StatGrid>
+      </Section>
+
+      <Section>
+        <button type="button" className="row tool-row" onClick={() => setStationsOpen(true)}>
+          <span className="tool-icon">
+            <IconPin size={20} />
+          </span>
+          <div className="row-main">
+            <span className="row-title">Prix à la pompe</span>
+            <span className="row-subtitle">Stations les moins chères près de moi</span>
+          </div>
+          <IconChevron size={18} className="row-chevron" />
+        </button>
       </Section>
 
       <Section title="Historique">
@@ -281,6 +304,8 @@ export function FuelPage() {
           </div>
         </div>
       </BottomSheet>
+
+      <StationsSheet open={stationsOpen} onClose={() => setStationsOpen(false)} onUseStation={useStation} />
     </>
   );
 }

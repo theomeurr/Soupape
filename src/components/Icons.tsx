@@ -150,3 +150,25 @@ export const IconCheck = (p: IconProps) => (
     <path d="M20 6 9 17l-5-5" />
   </Svg>
 );
+
+export const IconFolder = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+  </Svg>
+);
+
+export const IconCalc = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="4" y="2" width="16" height="20" rx="2" />
+    <path d="M8 6h8" />
+    <path d="M16 14v4" />
+    <path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" />
+  </Svg>
+);
+
+export const IconPin = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+    <circle cx="12" cy="10" r="3" />
+  </Svg>
+);
