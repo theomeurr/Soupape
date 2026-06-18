@@ -284,7 +284,7 @@ p {
 .fab {
   position: fixed;
   right: max(20px, calc((100% - 560px) / 2 + 20px));
-  bottom: calc(env(safe-area-inset-bottom) + 92px);
+  bottom: calc(env(safe-area-inset-bottom) + 84px);
   width: 58px;
   height: 58px;
   border-radius: 19px;
@@ -311,38 +311,22 @@ p {
   bottom: 0;
   z-index: 30;
   display: flex;
-  padding: 8px 16px calc(env(safe-area-inset-bottom) + 6px);
-  background: rgba(255, 255, 255, 0.94);
-  border-top: 1px solid rgba(0, 0, 0, 0.07);
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 -8px 26px -18px rgba(0, 0, 0, 0.3);
-}
-
-.tabbar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 45%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.8;
+  padding: 6px 12px max(env(safe-area-inset-bottom), 8px);
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -2px 14px rgba(0, 0, 0, 0.05);
 }
 
 .tabbar-indicator {
   position: absolute;
-  top: 8px;
-  bottom: calc(env(safe-area-inset-bottom) + 8px);
-  left: 16px;
-  width: calc((100% - 32px) / var(--tab-count));
+  top: 6px;
+  bottom: max(env(safe-area-inset-bottom), 8px);
+  left: 12px;
+  width: calc((100% - 24px) / var(--tab-count));
   transform: translateX(calc(var(--active-index) * 100%));
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  box-shadow: 0 4px 14px -5px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: transform 0.48s cubic-bezier(0.34, 1.45, 0.5, 1), background 0.4s ease, box-shadow 0.4s ease;
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  transition: transform 0.42s cubic-bezier(0.34, 1.4, 0.5, 1), background 0.4s ease;
 }
 
 .tabbar-item {
@@ -352,8 +336,8 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 9px 0;
+  gap: 4px;
+  padding: 8px 0;
   background: none;
   border: none;
   color: var(--text-dim);
