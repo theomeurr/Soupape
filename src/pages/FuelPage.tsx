@@ -7,6 +7,7 @@ import {
   formatCurrency,
   formatCurrencyShort,
   formatDate,
+  formatDateShort,
   formatLiters,
   formatNumber,
   parseNumber,
@@ -78,6 +79,17 @@ export function FuelPage() {
     () => [...fuel].sort((a, b) => b.date.localeCompare(a.date) || b.odometer - a.odometer),
     [fuel],
   );
+
+  // Last price paid at the currently selected station (excluding the entry being edited).
+  const lastAtStation = useMemo(() => {
+    const st = form.station.trim().toLowerCase();
+    if (!st) return null;
+    return (
+      fuel
+        .filter((f) => (f.station ?? '').trim().toLowerCase() === st && f.id !== editingId && f.pricePerLiter > 0)
+        .sort((a, b) => b.date.localeCompare(a.date))[0] ?? null
+    );
+  }, [fuel, form.station, editingId]);
 
   const [calcOrder, setCalcOrder] = useState<CalcField[]>(['p', 'l', 't']);
 
@@ -316,6 +328,18 @@ export function FuelPage() {
                 onChange={(e) => setForm({ ...form, station: e.target.value })}
               />
             </Field>
+          )}
+          {lastAtStation && (
+            <button
+              type="button"
+              className="last-price"
+              onClick={() => setField('p', toInput(lastAtStation.pricePerLiter, 3))}
+            >
+              <span>
+                Dernier ici : <strong>{fmtPrice(lastAtStation.pricePerLiter)}</strong> · {formatDateShort(lastAtStation.date)}
+              </span>
+              <span className="last-price-apply">Appliquer</span>
+            </button>
           )}
           <label className="switch-row">
             <span>

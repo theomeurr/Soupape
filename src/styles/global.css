@@ -1187,6 +1187,38 @@ p {
   text-align: center;
 }
 
+/* ---------- Last price at station ---------- */
+
+.last-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.last-price:active {
+  transform: scale(0.99);
+}
+.last-price strong {
+  color: var(--text);
+  font-weight: 700;
+}
+.last-price-apply {
+  flex: none;
+  color: var(--accent);
+  font-weight: 600;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition-duration: 0.01ms !important;
