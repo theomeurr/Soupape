@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useStore } from '../store/StoreContext';
-import { parseImported } from '../store/db';
+import { countEntries, mergeData, parseImported } from '../store/db';
 import { todayISO } from '../lib/format';
 import { backupToDrive, restoreFromDrive } from '../lib/drive';
 import { downloadCSV, printCarnet } from '../lib/exporters';
@@ -17,8 +17,25 @@ function formatDateTime(iso: string): string {
 export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { data, updateSettings, replaceAll, resetAll } = useStore();
   const fileRef = useRef<HTMLInputElement>(null);
+  const mergeRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<Msg>(null);
+
+  async function onMergeFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const incoming = parseImported(await file.text());
+      const before = countEntries(data);
+      const merged = mergeData(data, incoming);
+      replaceAll(merged);
+      setMsg({ type: 'ok', text: `${countEntries(merged) - before} élément(s) importé(s) ✓` });
+    } catch (err) {
+      setMsg({ type: 'err', text: 'Import impossible : ' + (err instanceof Error ? err.message : 'fichier invalide') });
+    } finally {
+      e.target.value = '';
+    }
+  }
 
   function exportData() {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -141,10 +158,14 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
           <Button variant="ghost" onClick={exportData}>
             <IconDownload size={18} /> Exporter (JSON)
           </Button>
+          <Button variant="ghost" onClick={() => mergeRef.current?.click()}>
+            <IconUpload size={18} /> Importer (fusionner)
+          </Button>
           <Button variant="ghost" onClick={() => fileRef.current?.click()}>
-            <IconUpload size={18} /> Importer un fichier
+            <IconUpload size={18} /> Importer (remplacer)
           </Button>
           <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={onFile} />
+          <input ref={mergeRef} type="file" accept="application/json,.json" hidden onChange={onMergeFile} />
         </div>
 
         <Button variant="danger" onClick={reset}>

@@ -81,3 +81,31 @@ export function newId(): string {
   }
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
+
+function withNewIds<T extends { id: string }>(arr: T[]): T[] {
+  return arr.map((e) => ({ ...e, id: newId() }));
+}
+
+/** Add the incoming entries to the current data (fresh ids), keeping current settings. */
+export function mergeData(current: AppData, incoming: AppData): AppData {
+  return {
+    ...current,
+    fuel: [...current.fuel, ...withNewIds(incoming.fuel)],
+    mileage: [...current.mileage, ...withNewIds(incoming.mileage)],
+    maintenance: [...current.maintenance, ...withNewIds(incoming.maintenance)],
+    reminders: [...current.reminders, ...withNewIds(incoming.reminders)],
+    documents: [...current.documents, ...withNewIds(incoming.documents)],
+    insurance: [...current.insurance, ...withNewIds(incoming.insurance)],
+  };
+}
+
+export function countEntries(data: AppData): number {
+  return (
+    data.fuel.length +
+    data.mileage.length +
+    data.maintenance.length +
+    data.reminders.length +
+    data.documents.length +
+    data.insurance.length
+  );
+}
