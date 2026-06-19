@@ -41,10 +41,12 @@ const emptyForm = (): FuelForm => ({
   pricePerLiter: '',
   totalCost: '',
   fullTank: true,
-  fuelType: 'SP95',
-  station: '',
+  fuelType: 'SP95-E10',
+  station: 'Leclerc',
   note: '',
 });
+
+const STATIONS = ['Leclerc', 'Total', 'Intermarché', 'Carrefour', 'Système U', 'Auchan', 'Esso', 'BP', 'Avia'];
 
 const fmtPrice = (v: number) => `${v.toFixed(3).replace('.', ',')} €`;
 
@@ -124,7 +126,7 @@ export function FuelPage() {
       pricePerLiter: toInput(e.pricePerLiter, 3),
       totalCost: String(e.totalCost),
       fullTank: e.fullTank,
-      fuelType: e.fuelType ?? 'SP95',
+      fuelType: e.fuelType ?? 'SP95-E10',
       station: e.station ?? '',
       note: e.note ?? '',
     });
@@ -293,13 +295,28 @@ export function FuelPage() {
               </Select>
             </Field>
             <Field label="Station">
+              <Select
+                value={STATIONS.includes(form.station) ? form.station : 'Autre'}
+                onChange={(e) => setForm({ ...form, station: e.target.value === 'Autre' ? '' : e.target.value })}
+              >
+                {STATIONS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+                <option value="Autre">Autre…</option>
+              </Select>
+            </Field>
+          </div>
+          {!STATIONS.includes(form.station) && (
+            <Field label="Nom de la station">
               <Input
-                placeholder="TotalEnergies…"
+                placeholder="Saisir la station"
                 value={form.station}
                 onChange={(e) => setForm({ ...form, station: e.target.value })}
               />
             </Field>
-          </div>
+          )}
           <label className="switch-row">
             <span>
               <span className="switch-title">Plein complet</span>
