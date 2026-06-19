@@ -125,6 +125,7 @@ export interface InsuranceEntry {
   periodMonths?: number; // période couverte (1 mensuel, 12 annuel…)
   renewalDate?: string; // échéance / renouvellement du contrat
   note?: string;
+  photos?: string[]; // pièces jointes (contrat, attestation… images ou PDF)
 }
 
 export interface Settings {

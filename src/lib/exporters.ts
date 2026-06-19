@@ -78,7 +78,10 @@ export function printCarnet(data: AppData) {
           <span class="cost">${esc(formatCurrency(m.cost, data.settings.currency))}</span>
         </div>
         ${m.note ? `<p class="note">${esc(m.note)}</p>` : ''}
-        ${m.photos?.length ? `<div class="photos">${m.photos.map((p) => `<img src="${p}" alt=""/>`).join('')}</div>` : ''}
+        ${(() => {
+          const imgs = (m.photos ?? []).filter((p) => !p.startsWith('data:application/pdf'));
+          return imgs.length ? `<div class="photos">${imgs.map((p) => `<img src="${p}" alt=""/>`).join('')}</div>` : '';
+        })()}
       </article>`,
     )
     .join('');

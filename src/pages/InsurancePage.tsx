@@ -14,6 +14,7 @@ import { BarChart } from '../components/Charts';
 import { BottomSheet } from '../components/BottomSheet';
 import { PageHeader, Section, Row, Fab } from '../components/Page';
 import { Button, Field, Input, Segmented, Select, Stat, StatGrid, EmptyState } from '../components/UI';
+import { PhotoPicker } from '../components/PhotoPicker';
 import { IconShield, IconTrash } from '../components/Icons';
 
 const ACCENT = '#30B0C7';
@@ -35,6 +36,7 @@ interface InsuranceForm {
   periodMonths: string;
   renewalDate: string;
   note: string;
+  photos: string[];
 }
 
 const emptyForm = (): InsuranceForm => ({
@@ -45,6 +47,7 @@ const emptyForm = (): InsuranceForm => ({
   periodMonths: '12',
   renewalDate: '',
   note: '',
+  photos: [],
 });
 
 export function InsurancePage() {
@@ -85,6 +88,7 @@ export function InsurancePage() {
       periodMonths: String(e.periodMonths ?? 12),
       renewalDate: e.renewalDate ?? '',
       note: e.note ?? '',
+      photos: e.photos ?? [],
     });
     setSheetOpen(true);
   }
@@ -100,6 +104,7 @@ export function InsurancePage() {
       periodMonths: parseNumber(form.periodMonths) || 12,
       renewalDate: form.renewalDate || undefined,
       note: form.note.trim() || undefined,
+      photos: form.photos.length ? form.photos : undefined,
     };
     if (editingId) update('insurance', editingId, payload);
     else add('insurance', payload);
@@ -143,7 +148,7 @@ export function InsurancePage() {
                 title={e.insurer || e.formula || 'Assurance'}
                 subtitle={`${e.formula ?? ''}${e.formula ? ' · ' : ''}${formatDate(e.date)}${
                   e.renewalDate ? ' · échéance ' + formatDateShort(e.renewalDate) : ''
-                }`}
+                }${e.photos?.length ? ' · 📎' + e.photos.length : ''}`}
                 value={formatCurrency(e.amount)}
                 meta={periodLabel(e.periodMonths)}
                 onClick={() => openEdit(e)}
@@ -223,6 +228,9 @@ export function InsurancePage() {
           </div>
           <Field label="Note">
             <Input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
+          </Field>
+          <Field label="Pièces jointes" hint="contrat, attestation… (photo ou PDF)">
+            <PhotoPicker value={form.photos} onChange={(photos) => setForm({ ...form, photos })} />
           </Field>
           <Button onClick={submit}>{editingId ? 'Enregistrer' : 'Ajouter la cotisation'}</Button>
         </div>

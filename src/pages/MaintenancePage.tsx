@@ -217,7 +217,7 @@ export function MaintenancePage() {
               onChange={(e) => setForm({ ...form, garage: e.target.value })}
             />
           </Field>
-          <Field label="Factures / photos">
+          <Field label="Factures" hint="photo ou PDF">
             <PhotoPicker value={form.photos} onChange={(photos) => setForm({ ...form, photos })} />
           </Field>
           <Button onClick={submit}>{editingId ? 'Enregistrer' : "Ajouter l'intervention"}</Button>

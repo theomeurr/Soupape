@@ -157,7 +157,7 @@ export function DocumentsSheet({ open, onClose }: { open: boolean; onClose: () =
           <Field label="Note">
             <Input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
           </Field>
-          <Field label="Photos / scans">
+          <Field label="Pièces jointes" hint="photo ou PDF">
             <PhotoPicker value={form.photos} onChange={(photos) => setForm({ ...form, photos })} />
           </Field>
           <Button onClick={submit}>{editingId ? 'Enregistrer' : 'Ajouter le document'}</Button>
