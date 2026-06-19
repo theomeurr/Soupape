@@ -311,7 +311,7 @@ p {
   bottom: 0;
   z-index: 30;
   display: flex;
-  padding: 6px 12px max(env(safe-area-inset-bottom), 8px);
+  padding: 6px 8px max(env(safe-area-inset-bottom), 8px);
   background: #fff;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 -2px 14px rgba(0, 0, 0, 0.05);
@@ -321,8 +321,8 @@ p {
   position: absolute;
   top: 6px;
   bottom: max(env(safe-area-inset-bottom), 8px);
-  left: 12px;
-  width: calc((100% - 24px) / var(--tab-count));
+  left: 8px;
+  width: calc((100% - 16px) / var(--tab-count));
   transform: translateX(calc(var(--active-index) * 100%));
   border-radius: 15px;
   background: color-mix(in srgb, var(--accent) 12%, transparent);
@@ -333,11 +333,12 @@ p {
   position: relative;
   z-index: 1;
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 8px 0;
+  padding: 8px 2px;
   background: none;
   border: none;
   color: var(--text-dim);
@@ -359,9 +360,13 @@ p {
 }
 
 .tabbar-label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ---------- Bottom sheet ---------- */

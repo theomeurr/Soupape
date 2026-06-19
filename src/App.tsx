@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useStore } from './store/StoreContext';
 import { TabBar, type TabDef } from './components/TabBar';
-import { IconGauge, IconFuel, IconWrench, IconSettings, IconFolder } from './components/Icons';
+import { IconGauge, IconFuel, IconWrench, IconShield, IconSettings, IconFolder } from './components/Icons';
 import { MileagePage } from './pages/MileagePage';
 import { FuelPage } from './pages/FuelPage';
 import { MaintenancePage } from './pages/MaintenancePage';
+import { InsurancePage } from './pages/InsurancePage';
 import { SettingsSheet } from './components/SettingsSheet';
 import { DocumentsSheet } from './components/DocumentsSheet';
 
@@ -12,6 +13,7 @@ const TABS: TabDef[] = [
   { id: 'mileage', label: 'Kilométrage', Icon: IconGauge, accent: '#007AFF' },
   { id: 'fuel', label: 'Essence', Icon: IconFuel, accent: '#FF9500' },
   { id: 'maintenance', label: 'Entretien', Icon: IconWrench, accent: '#AF52DE' },
+  { id: 'insurance', label: 'Assurance', Icon: IconShield, accent: '#30B0C7' },
 ];
 
 export default function App() {
@@ -48,6 +50,7 @@ export default function App() {
         {active === 'mileage' && <MileagePage />}
         {active === 'fuel' && <FuelPage />}
         {active === 'maintenance' && <MaintenancePage />}
+        {active === 'insurance' && <InsurancePage />}
       </main>
 
       <TabBar tabs={TABS} active={active} onChange={setActive} />

@@ -1,6 +1,6 @@
 // Domain model for Soupape — all amounts in EUR, distances in km, volumes in L.
 
-export type CollectionKey = 'fuel' | 'mileage' | 'maintenance' | 'reminders' | 'documents';
+export type CollectionKey = 'fuel' | 'mileage' | 'maintenance' | 'reminders' | 'documents' | 'insurance';
 
 export type FuelType = 'SP95' | 'SP98' | 'SP95-E10' | 'Diesel' | 'E85' | 'GPL' | 'Électrique';
 
@@ -112,6 +112,21 @@ export interface DocumentItem {
   photos?: string[]; // scans / photos (data URLs JPEG compressées)
 }
 
+export type InsuranceType = 'Tiers' | 'Tiers étendu' | 'Tous risques' | 'Autre';
+
+export const INSURANCE_TYPES: InsuranceType[] = ['Tiers', 'Tiers étendu', 'Tous risques', 'Autre'];
+
+export interface InsuranceEntry {
+  id: string;
+  date: string; // date du paiement / de la prime
+  amount: number; // € payé
+  insurer?: string; // assureur (MAIF, AXA…)
+  formula?: InsuranceType;
+  periodMonths?: number; // période couverte (1 mensuel, 12 annuel…)
+  renewalDate?: string; // échéance / renouvellement du contrat
+  note?: string;
+}
+
 export interface Settings {
   carName: string;
   currency: string; // ISO code, e.g. 'EUR'
@@ -130,6 +145,7 @@ export interface AppData {
   maintenance: MaintenanceEntry[];
   reminders: Reminder[];
   documents: DocumentItem[];
+  insurance: InsuranceEntry[];
 }
 
 export type EntryMap = {
@@ -138,4 +154,5 @@ export type EntryMap = {
   maintenance: MaintenanceEntry;
   reminders: Reminder;
   documents: DocumentItem;
+  insurance: InsuranceEntry;
 };
