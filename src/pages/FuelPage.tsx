@@ -26,6 +26,7 @@ interface FuelForm {
   date: string;
   odometer: string;
   liters: string;
+  pricePerLiter: string;
   totalCost: string;
   fullTank: boolean;
   fuelType: FuelType;
@@ -37,6 +38,7 @@ const emptyForm = (): FuelForm => ({
   date: todayISO(),
   odometer: '',
   liters: '',
+  pricePerLiter: '',
   totalCost: '',
   fullTank: true,
   fuelType: 'SP95',
@@ -45,6 +47,16 @@ const emptyForm = (): FuelForm => ({
 });
 
 const fmtPrice = (v: number) => `${v.toFixed(3).replace('.', ',')} €`;
+
+// Linked fields: litres (l) × prix/L (p) = total (t). Fill any two → the third.
+type CalcField = 'l' | 'p' | 't';
+const CALC_KEY: Record<CalcField, 'liters' | 'pricePerLiter' | 'totalCost'> = {
+  l: 'liters',
+  p: 'pricePerLiter',
+  t: 'totalCost',
+};
+const toInput = (n: number, dec: number) =>
+  Number.isFinite(n) && n > 0 ? parseFloat(n.toFixed(dec)).toString().replace('.', ',') : '';
 
 export function FuelPage() {
   const { data, add, update, remove } = useStore();
@@ -65,21 +77,40 @@ export function FuelPage() {
     [fuel],
   );
 
-  const livePrice = useMemo(() => {
-    const l = parseNumber(form.liters);
-    const t = parseNumber(form.totalCost);
-    return l > 0 && t > 0 ? t / l : 0;
-  }, [form.liters, form.totalCost]);
+  const [calcOrder, setCalcOrder] = useState<CalcField[]>(['p', 'l', 't']);
+
+  // Edit any field → recompute the least-recently-touched of the three.
+  function setField(field: CalcField, value: string) {
+    const order = [field, ...calcOrder.filter((f) => f !== field)] as CalcField[];
+    const next: FuelForm = { ...form, [CALC_KEY[field]]: value };
+    const compute = order[2];
+    const l = parseNumber(next.liters);
+    const p = parseNumber(next.pricePerLiter);
+    const t = parseNumber(next.totalCost);
+    if (compute === 't' && l > 0 && p > 0) next.totalCost = toInput(l * p, 2);
+    else if (compute === 'p' && t > 0 && l > 0) next.pricePerLiter = toInput(t / l, 3);
+    else if (compute === 'l' && t > 0 && p > 0) next.liters = toInput(t / p, 2);
+    setForm(next);
+    setCalcOrder(order);
+  }
 
   function openAdd() {
     setEditingId(null);
     setForm(emptyForm());
+    setCalcOrder(['p', 'l', 't']);
     setSheetOpen(true);
   }
 
   function useStation(s: Station, key: ApiFuelKey) {
     setEditingId(null);
-    setForm({ ...emptyForm(), station: s.name, fuelType: API_TO_FUELTYPE[key] });
+    const price = s.prices[key];
+    setForm({
+      ...emptyForm(),
+      station: s.name,
+      fuelType: API_TO_FUELTYPE[key],
+      pricePerLiter: price ? toInput(price, 3) : '',
+    });
+    setCalcOrder(['p', 'l', 't']);
     setStationsOpen(false);
     setSheetOpen(true);
   }
@@ -90,25 +121,32 @@ export function FuelPage() {
       date: e.date,
       odometer: e.odometer ? String(e.odometer) : '',
       liters: String(e.liters),
+      pricePerLiter: toInput(e.pricePerLiter, 3),
       totalCost: String(e.totalCost),
       fullTank: e.fullTank,
       fuelType: e.fuelType ?? 'SP95',
       station: e.station ?? '',
       note: e.note ?? '',
     });
+    setCalcOrder(['p', 'l', 't']);
     setSheetOpen(true);
   }
 
   function submit() {
-    const liters = parseNumber(form.liters);
-    const totalCost = parseNumber(form.totalCost);
-    if (liters <= 0 || totalCost <= 0) return;
+    let liters = parseNumber(form.liters);
+    let price = parseNumber(form.pricePerLiter);
+    let total = parseNumber(form.totalCost);
+    // Complete the missing value from the two provided.
+    if (total <= 0 && liters > 0 && price > 0) total = liters * price;
+    else if (price <= 0 && total > 0 && liters > 0) price = total / liters;
+    else if (liters <= 0 && total > 0 && price > 0) liters = total / price;
+    if (liters <= 0 || total <= 0) return;
     const payload: Omit<FuelEntry, 'id'> = {
       date: form.date,
       odometer: parseNumber(form.odometer),
       liters,
-      totalCost,
-      pricePerLiter: totalCost / liters,
+      totalCost: total,
+      pricePerLiter: price > 0 ? price : total / liters,
       fullTank: form.fullTank,
       fuelType: form.fuelType,
       station: form.station.trim() || undefined,
@@ -222,19 +260,28 @@ export function FuelPage() {
                 placeholder="42,5"
                 suffix="L"
                 value={form.liters}
-                onChange={(e) => setForm({ ...form, liters: e.target.value })}
+                onChange={(e) => setField('l', e.target.value)}
               />
             </Field>
-            <Field label="Montant" hint={livePrice ? `${fmtPrice(livePrice)} / litre` : 'total payé'}>
+            <Field label="Prix au litre">
               <Input
                 inputMode="decimal"
-                placeholder="78,90"
-                suffix="€"
-                value={form.totalCost}
-                onChange={(e) => setForm({ ...form, totalCost: e.target.value })}
+                placeholder="1,889"
+                suffix="€/L"
+                value={form.pricePerLiter}
+                onChange={(e) => setField('p', e.target.value)}
               />
             </Field>
           </div>
+          <Field label="Montant total" hint="renseigne 2 champs, le 3ᵉ se calcule">
+            <Input
+              inputMode="decimal"
+              placeholder="78,90"
+              suffix="€"
+              value={form.totalCost}
+              onChange={(e) => setField('t', e.target.value)}
+            />
+          </Field>
           <div className="form-row">
             <Field label="Carburant">
               <Select value={form.fuelType} onChange={(e) => setForm({ ...form, fuelType: e.target.value as FuelType })}>

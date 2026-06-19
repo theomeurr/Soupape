@@ -39,15 +39,16 @@ export interface Station {
 }
 
 const DATASET = 'prix-des-carburants-en-france-flux-instantane-v2';
-const BASE = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/${DATASET}/records`;
+// Opendatasoft v1 search API: geofilter.distance=lat,lon,meters is simple and robust.
+const BASE = 'https://data.economie.gouv.fr/api/records/1.0/search/';
 
 export async function fetchNearbyStations(lat: number, lon: number, radiusKm = 8, limit = 40): Promise<Station[]> {
-  const where = `within_distance(geo_point_borne, geom'POINT(${lon} ${lat})', ${radiusKm}km)`;
-  const url = `${BASE}?where=${encodeURIComponent(where)}&limit=${limit}`;
+  const radiusM = Math.round(radiusKm * 1000);
+  const url = `${BASE}?dataset=${DATASET}&geofilter.distance=${lat},${lon},${radiusM}&rows=${limit}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Service indisponible (${res.status})`);
   const data = await res.json();
-  const records: Record<string, unknown>[] = data.results ?? [];
+  const records: ApiRecord[] = data.records ?? [];
   const stations = records
     .map((r) => parseStation(r))
     .filter((s): s is Station => s !== null)
@@ -55,38 +56,43 @@ export async function fetchNearbyStations(lat: number, lon: number, radiusKm = 8
   return stations.sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
+interface ApiRecord {
+  recordid?: string;
+  fields?: Record<string, unknown>;
+  geometry?: { coordinates?: number[] };
+}
+
 function num(v: unknown): number | undefined {
   const n = typeof v === 'string' ? parseFloat(v.replace(',', '.')) : typeof v === 'number' ? v : NaN;
   return Number.isFinite(n) ? n : undefined;
 }
 
-function parseStation(r: Record<string, unknown>): Station | null {
-  const pt = r.geo_point_borne as { lat?: number; lon?: number } | number[] | undefined;
+function parseStation(rec: ApiRecord): Station | null {
+  const f = rec.fields ?? {};
   let lat: number | undefined;
   let lon: number | undefined;
+  const pt = f.geo_point_borne; // v1 returns [lat, lon]
   if (Array.isArray(pt)) {
-    lon = num(pt[0]);
-    lat = num(pt[1]);
-  } else if (pt && typeof pt === 'object') {
-    lat = num(pt.lat);
-    lon = num(pt.lon);
+    lat = num(pt[0]);
+    lon = num(pt[1]);
+  } else if (rec.geometry?.coordinates) {
+    lon = num(rec.geometry.coordinates[0]);
+    lat = num(rec.geometry.coordinates[1]);
   }
-  if (lat === undefined) lat = num(r.latitude);
-  if (lon === undefined) lon = num(r.longitude);
   if (lat === undefined || lon === undefined) return null;
 
   const prices: Partial<Record<ApiFuelKey, number>> = {};
   for (const k of FUEL_KEYS) {
-    const p = num(r[`${k}_prix`]);
+    const p = num(f[`${k}_prix`]);
     if (p !== undefined && p > 0 && p < 10) prices[k] = p;
   }
 
   return {
-    id: String(r.id ?? `${lat},${lon}`),
-    name: String(r.enseigne ?? r.brand ?? r.adresse ?? 'Station'),
-    address: String(r.adresse ?? ''),
-    city: String(r.ville ?? ''),
-    cp: String(r.cp ?? ''),
+    id: String(rec.recordid ?? `${lat},${lon}`),
+    name: String(f.adresse ?? f.enseigne ?? 'Station'),
+    address: String(f.adresse ?? ''),
+    city: String(f.ville ?? ''),
+    cp: String(f.cp ?? ''),
     lat,
     lon,
     distanceKm: 0,
