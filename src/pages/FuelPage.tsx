@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useStore } from '../store/StoreContext';
 import { FUEL_TYPES, type FuelEntry, type FuelType } from '../types';
 import { fuelStats, consumptionSeries } from '../lib/stats';
@@ -17,9 +17,10 @@ import { BarChart, LineChart } from '../components/Charts';
 import { BottomSheet } from '../components/BottomSheet';
 import { StationsSheet } from '../components/StationsSheet';
 import { API_TO_FUELTYPE, type ApiFuelKey, type Station } from '../lib/fuelPrices';
+import { scanReceipt, type ParsedReceipt } from '../lib/ocr';
 import { PageHeader, Section, Row, Fab } from '../components/Page';
 import { Button, Field, Input, Segmented, Select, Stat, StatGrid, EmptyState } from '../components/UI';
-import { IconFuel, IconTrash, IconPin, IconChevron } from '../components/Icons';
+import { IconFuel, IconTrash, IconPin, IconChevron, IconCamera } from '../components/Icons';
 
 const ACCENT = '#FF9500';
 
@@ -74,6 +75,10 @@ export function FuelPage() {
   const [metric, setMetric] = useState<'cost' | 'price' | 'consumption'>('cost');
   const [period, setPeriod] = useState<Period>('month');
 
+  const scanRef = useRef<HTMLInputElement>(null);
+  const [scanning, setScanning] = useState<number | null>(null);
+  const [scanMsg, setScanMsg] = useState<string | null>(null);
+
   const stats = useMemo(() => fuelStats(fuel), [fuel]);
   const sorted = useMemo(
     () => [...fuel].sort((a, b) => b.date.localeCompare(a.date) || b.odometer - a.odometer),
@@ -108,10 +113,54 @@ export function FuelPage() {
     setCalcOrder(order);
   }
 
+  function applyParsed(p: ParsedReceipt) {
+    const found: string[] = [];
+    setForm((prev) => {
+      let l = p.liters;
+      let pr = p.pricePerLiter;
+      let t = p.totalCost;
+      if (t == null && l != null && pr != null) t = l * pr;
+      else if (pr == null && t != null && l != null) pr = t / l;
+      else if (l == null && t != null && pr != null) l = t / pr;
+      if (l != null) found.push('litres');
+      if (pr != null) found.push('prix/L');
+      if (t != null) found.push('montant');
+      if (p.date) found.push('date');
+      if (p.station) found.push('station');
+      return {
+        ...prev,
+        date: p.date ?? prev.date,
+        liters: l != null ? toInput(l, 2) : prev.liters,
+        pricePerLiter: pr != null ? toInput(pr, 3) : prev.pricePerLiter,
+        totalCost: t != null ? toInput(t, 2) : prev.totalCost,
+        station: p.station ?? prev.station,
+        fuelType: p.fuelType ?? prev.fuelType,
+      };
+    });
+    setScanMsg(found.length ? `Lu : ${found.join(', ')} — vérifie puis enregistre.` : 'Rien de lisible — saisis à la main.');
+  }
+
+  async function onScan(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setScanning(0);
+    setScanMsg(null);
+    try {
+      const result = await scanReceipt(file, (pct) => setScanning(pct));
+      applyParsed(result);
+    } catch (err) {
+      setScanMsg(err instanceof Error ? err.message : 'Lecture impossible');
+    } finally {
+      setScanning(null);
+      e.target.value = '';
+    }
+  }
+
   function openAdd() {
     setEditingId(null);
     setForm(emptyForm());
     setCalcOrder(['p', 'l', 't']);
+    setScanMsg(null);
     setSheetOpen(true);
   }
 
@@ -143,6 +192,7 @@ export function FuelPage() {
       note: e.note ?? '',
     });
     setCalcOrder(['p', 'l', 't']);
+    setScanMsg(null);
     setSheetOpen(true);
   }
 
@@ -253,6 +303,17 @@ export function FuelPage() {
         }
       >
         <div className="form">
+          <button
+            type="button"
+            className="scan-btn"
+            onClick={() => scanRef.current?.click()}
+            disabled={scanning !== null}
+          >
+            <IconCamera size={20} />
+            {scanning !== null ? `Lecture du ticket… ${scanning}%` : 'Scanner le ticket'}
+          </button>
+          {scanMsg && <p className="scan-msg">{scanMsg}</p>}
+          <input ref={scanRef} type="file" accept="image/*" capture="environment" hidden onChange={onScan} />
           <div className="form-row">
             <Field label="Date">
               <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
