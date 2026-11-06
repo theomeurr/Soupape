@@ -85,6 +85,12 @@ export function FuelPage() {
     [fuel],
   );
 
+  // Price/L evolution shown directly on the page (monthly average, last 12 months).
+  const priceData = useMemo(
+    () => aggregate(fuel, (f) => f.date, (f) => f.pricePerLiter, 'month', { average: true }),
+    [fuel],
+  );
+
   // Last price paid at the currently selected station (excluding the entry being edited).
   const lastAtStation = useMemo(() => {
     const st = form.station.trim().toLowerCase();
@@ -248,6 +254,14 @@ export function FuelPage() {
           <Stat label="Pleins" value={stats.fillUps} sub={formatLiters(stats.totalLiters)} />
         </StatGrid>
       </Section>
+
+      {priceData.length >= 2 && (
+        <Section title="Prix au litre">
+          <div className="chart-card">
+            <LineChart data={priceData} color={ACCENT} formatValue={fmtPrice} />
+          </div>
+        </Section>
+      )}
 
       <Section>
         <button type="button" className="row tool-row" onClick={() => setStationsOpen(true)}>
